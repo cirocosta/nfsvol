@@ -37,7 +37,7 @@ plugin-logs:
 		--privileged \
 		--pid=host \
 		justincormack/nsenter1 \
-		/bin/sh -c 'docker-runc exec $(PLUGIN_ID) cat /var/log/nfsvol-plugin.log'
+		/bin/sh -c 'docker-runc exec $(PLUGIN_ID) cat /var/log/nfsvol/plugin.log'
 
 plugin-exec:
 	docker run \

@@ -12,4 +12,6 @@ RUN set -ex && \
 FROM busybox
 COPY --from=builder /usr/bin/nfsvol /nfsvol
 
+RUN mkdir -p /run/docker/plugins /mnt/state /mnt/volumes /var/log/nfsvol
+
 CMD [ "nfsvol" ]

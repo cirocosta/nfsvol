@@ -27,5 +27,16 @@
     },
     "Network": {
         "Type": "host"
-    }
+    },
+    "Mounts": [
+        {
+            "destination": "/mnt/state",
+            "options": [
+                "rbind"
+            ],
+            "source": "/var/lib/docker/plugins/",
+            "type": "bind"
+        }
+    ],
+    "propagatedmount": "/mnt/volumes"
 }

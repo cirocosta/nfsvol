@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"os"
 
 	"github.com/pkg/errors"
@@ -11,10 +12,11 @@ import (
 
 const (
 	socketAddress      = "/run/docker/plugins/nfsvol.sock"
-	logFileDestination = "/var/log/nfsvol-plugin.log"
+	logFileDestination = "/var/log/nfsvol/plugin.log"
 )
 
 func main() {
+
 	if os.Getenv("DEBUG") != "1" {
 		log.SetLevel(log.DebugLevel)
 	}
@@ -27,8 +29,10 @@ func main() {
 	}
 	defer f.Close()
 
+	stdoutAndFile := io.MultiWriter(os.Stdout, f)
+
 	log.SetFormatter(&log.JSONFormatter{})
-	log.SetOutput(f)
+	log.SetOutput(stdoutAndFile)
 
 	d, err := newNfsVolDriver()
 	if err != nil {
