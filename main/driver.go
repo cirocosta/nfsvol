@@ -53,7 +53,9 @@ func (d nfsVolDriver) Create(req v.Request) (resp v.Response) {
 		return
 	}
 
-	logger.WithField("abs", abs).Debug("volume created")
+	logger.
+		WithField("abs", abs).
+		Debug("finish")
 	return
 }
 
@@ -81,8 +83,7 @@ func (d nfsVolDriver) List(req v.Request) (resp v.Response) {
 
 	logger.
 		WithField("number-of-volumes", len(dirs)).
-		Debug("volumes listed")
-
+		Debug("finish")
 	return
 }
 
@@ -112,8 +113,9 @@ func (d nfsVolDriver) Get(req v.Request) (resp v.Response) {
 		Mountpoint: mp,
 	}
 
-	logger.WithField("mountpoint", mp).Debug("volume found")
-
+	logger.
+		WithField("mountpoint", mp).
+		Debug("finish")
 	return
 }
 
@@ -132,12 +134,11 @@ func (d nfsVolDriver) Remove(req v.Request) (resp v.Response) {
 		return
 	}
 
-	logger.Debug("volume deleted")
-
-	return v.Response{}
+	logger.Debug("finish")
+	return
 }
 
-func (d nfsVolDriver) Path(req v.Request) v.Response {
+func (d nfsVolDriver) Path(req v.Request) (resp v.Response) {
 	var logger = d.logger.
 		WithField("log-id", shortid.MustGenerate()).
 		WithField("method", "path").
@@ -145,10 +146,26 @@ func (d nfsVolDriver) Path(req v.Request) v.Response {
 		WithField("method", "path")
 	logger.Debug("start")
 
-	return v.Response{}
+	mp, found, err := d.manager.Get(req.Name)
+	if err != nil {
+		logger.WithError(err).Error("errored retrieving path for volume")
+		resp.Err = err.Error()
+		return
+	}
+
+	if !found {
+		logger.WithError(err).Info("volume not found")
+		resp.Err = fmt.Sprintf("volume %s not found", req.Name)
+		return
+	}
+
+	logger.Debug("finish")
+
+	resp.Mountpoint = mp
+	return
 }
 
-func (d nfsVolDriver) Mount(req v.MountRequest) v.Response {
+func (d nfsVolDriver) Mount(req v.MountRequest) (resp v.Response) {
 	var logger = d.logger.
 		WithField("log-id", shortid.MustGenerate()).
 		WithField("method", "mount").
@@ -156,30 +173,45 @@ func (d nfsVolDriver) Mount(req v.MountRequest) v.Response {
 		WithField("id", req.ID)
 	logger.Debug("start")
 
-	return v.Response{}
+	mp, found, err := d.manager.Get(req.Name)
+	if err != nil {
+		logger.WithError(err).Error("errored retrieving path for volume")
+		resp.Err = err.Error()
+		return
+	}
+
+	if !found {
+		logger.WithError(err).Info("volume not found")
+		resp.Err = fmt.Sprintf("volume %s not found", req.Name)
+		return
+	}
+
+	logger.Debug("finish")
+	resp.Mountpoint = mp
+	return
 }
 
-func (d nfsVolDriver) Unmount(req v.UnmountRequest) v.Response {
+func (d nfsVolDriver) Unmount(req v.UnmountRequest) (resp v.Response) {
 	var logger = d.logger.
 		WithField("log-id", shortid.MustGenerate()).
 		WithField("method", "unmount").
 		WithField("name", req.Name).
 		WithField("id", req.ID)
 	logger.Debug("start")
+	logger.Debug("finish")
 
-	return v.Response{}
+	return
 }
 
-func (d nfsVolDriver) Capabilities(req v.Request) v.Response {
+func (d nfsVolDriver) Capabilities(req v.Request) (resp v.Response) {
 	var logger = d.logger.
 		WithField("log-id", shortid.MustGenerate()).
 		WithField("method", "capabilities").
 		WithField("name", req.Name)
 	logger.Debug("start")
 
-	return v.Response{
-		Capabilities: v.Capability{
-			Scope: "global",
-		},
+	resp.Capabilities = v.Capability{
+		Scope: "global",
 	}
+	return
 }
