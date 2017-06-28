@@ -3,8 +3,11 @@ ROOTFS_CONTAINER	:= rootfs
 PLUGIN_NAME			:= nfsvol
 PLUGIN_ID			:= $(shell docker plugin inspect $(PLUGIN_NAME) --format '{{ .ID }}')
 
+
 install:
 	cd main && \
+		go install -v
+	cd lib && \
 		go install -v
 	cd nfsvolctl && \
 		go install -v
