@@ -1,5 +1,5 @@
-hash: 08a9afdd1f06364307662de8f1feb1a0d7a89a13ed9b7003215e22d868d25908
-updated: 2017-06-28T10:35:26.642323723-03:00
+hash: 8862bd83d75326484ba29f0fd74ec0ef8a6ce36567619416d177308b646df8f3
+updated: 2017-06-28T11:13:32.286635184-03:00
 imports:
 - name: github.com/coreos/go-systemd
   version: 24036eb3df68550d24a2736c5d013f4e83366866
@@ -33,4 +33,6 @@ imports:
   subpackages:
   - unix
   - windows
+- name: gopkg.in/urfave/cli.v1
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 testImports: []
