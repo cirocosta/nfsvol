@@ -16,7 +16,7 @@ const (
 )
 
 func main() {
-	if os.Getenv("DEBUG") != "1" {
+	if os.Getenv("DEBUG") == "1" {
 		log.SetLevel(log.DebugLevel)
 	}
 

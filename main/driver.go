@@ -5,13 +5,14 @@ import (
 
 	"github.com/cirocosta/nfsvol/manager"
 	"github.com/pkg/errors"
+	"github.com/ventu-io/go-shortid"
 
 	v "github.com/docker/go-plugins-helpers/volume"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	HostMountPoint = "/mnt"
+	HostMountPoint = "/mnt/efs"
 )
 
 type nfsVolDriver struct {
@@ -31,16 +32,19 @@ func newNfsVolDriver() (d nfsVolDriver, err error) {
 	}
 
 	d.logger = log.WithField("from", "driver")
+	d.logger.Info("driver initiated")
 	d.manager = &m
+
 	return
 }
 
 func (d nfsVolDriver) Create(req v.Request) (resp v.Response) {
-	logger := d.logger.
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "create").
 		WithField("name", req.Name).
 		WithField("opts", req.Options)
-
-	logger.Debug("received request to create volume")
+	logger.Debug("start")
 
 	abs, err := d.manager.Create(req.Name)
 	if err != nil {
@@ -54,11 +58,12 @@ func (d nfsVolDriver) Create(req v.Request) (resp v.Response) {
 }
 
 func (d nfsVolDriver) List(req v.Request) (resp v.Response) {
-	logger := d.logger.
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "list").
 		WithField("name", req.Name).
 		WithField("opts", req.Options)
-
-	logger.Debug("received request to list volumes")
+	logger.Debug("start")
 
 	dirs, err := d.manager.List()
 	if err != nil {
@@ -82,11 +87,12 @@ func (d nfsVolDriver) List(req v.Request) (resp v.Response) {
 }
 
 func (d nfsVolDriver) Get(req v.Request) (resp v.Response) {
-	logger := d.logger.
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "get").
 		WithField("name", req.Name).
 		WithField("opts", req.Options)
-
-	logger.Debug("received request to get volume")
+	logger.Debug("start")
 
 	mp, found, err := d.manager.Get(req.Name)
 	if err != nil {
@@ -112,11 +118,12 @@ func (d nfsVolDriver) Get(req v.Request) (resp v.Response) {
 }
 
 func (d nfsVolDriver) Remove(req v.Request) (resp v.Response) {
-	logger := d.logger.
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "remove").
 		WithField("name", req.Name).
 		WithField("opts", req.Options)
-
-	logger.Debug("received request to remove volume")
+	logger.Debug("start")
 
 	err := d.manager.Delete(req.Name)
 	if err != nil {
@@ -131,29 +138,45 @@ func (d nfsVolDriver) Remove(req v.Request) (resp v.Response) {
 }
 
 func (d nfsVolDriver) Path(req v.Request) v.Response {
-	d.logger.
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "path").
 		WithField("name", req.Name).
-		Debug("received request to get path of volume")
+		WithField("method", "path")
+	logger.Debug("start")
+
 	return v.Response{}
 }
 
 func (d nfsVolDriver) Mount(req v.MountRequest) v.Response {
-	d.logger.
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "mount").
 		WithField("name", req.Name).
-		WithField("id", req.ID).
-		Debug("received request to mount volume")
+		WithField("id", req.ID)
+	logger.Debug("start")
+
 	return v.Response{}
 }
 
 func (d nfsVolDriver) Unmount(req v.UnmountRequest) v.Response {
-	d.logger.
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "unmount").
 		WithField("name", req.Name).
-		WithField("id", req.ID).
-		Debug("received request to unmount volume")
+		WithField("id", req.ID)
+	logger.Debug("start")
+
 	return v.Response{}
 }
 
-func (d nfsVolDriver) Capabilities(v.Request) v.Response {
+func (d nfsVolDriver) Capabilities(req v.Request) v.Response {
+	var logger = d.logger.
+		WithField("log-id", shortid.MustGenerate()).
+		WithField("method", "capabilities").
+		WithField("name", req.Name)
+	logger.Debug("start")
+
 	return v.Response{
 		Capabilities: v.Capability{
 			Scope: "global",

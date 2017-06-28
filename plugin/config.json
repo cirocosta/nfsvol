@@ -30,13 +30,13 @@
     },
     "Mounts": [
         {
-            "destination": "/mnt/state",
+            "destination": "/mnt/efs",
             "options": [
-                "rbind"
+                "bind"
             ],
-            "source": "/var/lib/docker/plugins/",
+            "source": "/mnt/efs/",
             "type": "bind"
         }
     ],
-    "propagatedmount": "/mnt/volumes"
+    "PropagatedMount": "/mnt"
 }

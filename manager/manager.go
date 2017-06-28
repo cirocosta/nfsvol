@@ -21,6 +21,7 @@ type Config struct {
 var (
 	NameRegex      = regexp.MustCompile(`^[a-zA-Z][\w\-]{1,30}$`)
 	ErrInvalidName = errors.Errorf("Invalid name")
+	ErrNotFound    = errors.Errorf("Volume not found")
 )
 
 func isValidName(name string) bool {
@@ -129,9 +130,7 @@ func (m Manager) Delete(name string) (err error) {
 	}
 
 	if !found {
-		err = errors.Errorf(
-			"Couldn't find volume with name %s",
-			name)
+		err = ErrNotFound
 		return
 	}
 

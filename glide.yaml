@@ -16,3 +16,5 @@ import:
 - package: golang.org/x/sys
   subpackages:
   - unix
+- package: github.com/ventu-io/go-shortid
+  version: v1.0
