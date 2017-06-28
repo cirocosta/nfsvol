@@ -167,3 +167,43 @@ func TestGet_findsDirectory(t *testing.T) {
 	assert.True(t, found)
 	assert.Equal(t, path.Join(dir, "abc"), mp)
 }
+
+func TestDelete_succeedsForExistentVolume(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	absPath, err := m.Create("abc")
+	assert.NoError(t, err)
+	assert.Equal(t, path.Join(dir, "abc"), absPath)
+
+	finfo, err := os.Stat(absPath)
+	assert.NoError(t, err)
+	assert.True(t, finfo.IsDir())
+
+	err = m.Delete("abc")
+	assert.NoError(t, err)
+
+	finfo, err = os.Stat(absPath)
+	assert.Error(t, err)
+	assert.True(t, os.IsNotExist(err))
+}
+
+func TestDelete_failsForInexistentVolume(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	err = m.Delete("abc")
+	assert.Error(t, err)
+}
