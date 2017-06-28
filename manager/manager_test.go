@@ -54,7 +54,14 @@ func TestCreate_failsIfEmptyPath(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestCreate_failsIfNotAbsolutePath(t *testing.T) {
+func TestCreate_failsWithWeirdCharacters(t *testing.T) {
+	var weirdPaths = []string{
+		"./",
+		"'aa",
+		"bb+",
+		"a b c",
+	}
+
 	dir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
@@ -64,11 +71,13 @@ func TestCreate_failsIfNotAbsolutePath(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	_, err = m.Create("abc")
-	assert.Error(t, err)
+	for _, path := range weirdPaths {
+		_, err := m.Create(path)
+		assert.Error(t, err)
+	}
 }
 
-func TestCreate_succeedsWithAbsolutePath(t *testing.T) {
+func TestCreate_succeedsWithNormalPath(t *testing.T) {
 	dir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
@@ -78,7 +87,7 @@ func TestCreate_succeedsWithAbsolutePath(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	absPath, err := m.Create("/abc")
+	absPath, err := m.Create("abc")
 	assert.NoError(t, err)
 	assert.Equal(t, path.Join(dir, "abc"), absPath)
 
@@ -112,10 +121,10 @@ func TestList_listsDirectories(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	_, err = m.Create("/abc")
+	_, err = m.Create("abc")
 	assert.NoError(t, err)
 
-	_, err = m.Create("/def")
+	_, err = m.Create("def")
 	assert.NoError(t, err)
 
 	dirs, err := m.List()
@@ -150,33 +159,11 @@ func TestGet_findsDirectory(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	_, err = m.Create("/abc")
+	_, err = m.Create("abc")
 	assert.NoError(t, err)
 
 	mp, found, err := m.Get("abc")
 	assert.NoError(t, err)
 	assert.True(t, found)
 	assert.Equal(t, path.Join(dir, "abc"), mp)
-}
-
-func TestGet_findsDirectoryWithOrWithoutLeadingSlash(t *testing.T) {
-	dir, err := ioutil.TempDir("", "")
-	assert.NoError(t, err)
-	defer os.RemoveAll(dir)
-
-	m, err := manager.New(manager.Config{
-		Root: dir,
-	})
-	assert.NoError(t, err)
-
-	_, err = m.Create("/abc")
-	assert.NoError(t, err)
-
-	_, found, err := m.Get("/abc")
-	assert.NoError(t, err)
-	assert.True(t, found)
-
-	_, found, err = m.Get("abc/")
-	assert.NoError(t, err)
-	assert.True(t, found)
 }

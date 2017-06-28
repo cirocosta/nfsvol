@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
+	"regexp"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
@@ -16,6 +16,19 @@ type Manager struct {
 
 type Config struct {
 	Root string
+}
+
+var (
+	NameRegex      = regexp.MustCompile(`^[a-zA-Z][\w\-]{1,30}$`)
+	ErrInvalidName = errors.Errorf("Invalid name")
+)
+
+func isValidName(name string) bool {
+	if name == "" {
+		return false
+	}
+
+	return NameRegex.MatchString(name)
 }
 
 func New(cfg Config) (manager Manager, err error) {
@@ -61,7 +74,10 @@ func (m Manager) List() (directories []string, err error) {
 }
 
 func (m Manager) Get(name string) (absPath string, found bool, err error) {
-	name = strings.Trim(name, "/")
+	if !isValidName(name) {
+		err = ErrInvalidName
+		return
+	}
 
 	files, err := ioutil.ReadDir(m.root)
 	if err != nil {
@@ -82,16 +98,8 @@ func (m Manager) Get(name string) (absPath string, found bool, err error) {
 }
 
 func (m Manager) Create(path string) (absPath string, err error) {
-	if path == "" {
-		err = errors.Errorf(
-			"Can't create with empty path")
-		return
-	}
-
-	if !filepath.IsAbs(path) {
-		err = errors.Errorf(
-			"path (%s) must be absolute",
-			path)
+	if !isValidName(path) {
+		err = ErrInvalidName
 		return
 	}
 
@@ -100,6 +108,38 @@ func (m Manager) Create(path string) (absPath string, err error) {
 	if err != nil {
 		err = errors.Wrapf(err,
 			"Couldn't create directory %s", absPath)
+		return
+	}
+
+	return
+}
+
+func (m Manager) Delete(name string) (err error) {
+	if !isValidName(name) {
+		err = ErrInvalidName
+		return
+	}
+
+	abs, found, err := m.Get(name)
+	if err != nil {
+		err = errors.Wrapf(err,
+			"Errored retrieving abs path for name %s",
+			name)
+		return
+	}
+
+	if !found {
+		err = errors.Errorf(
+			"Couldn't find volume with name %s",
+			name)
+		return
+	}
+
+	err = os.RemoveAll(abs)
+	if err != nil {
+		err = errors.Wrapf(err,
+			"Errored removing volume named %s at path %s",
+			name, abs)
 		return
 	}
 
