@@ -87,3 +87,41 @@ func TestCreate_succeedsWithAbsolutePath(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, finfo.IsDir())
 }
+
+func TestList_canList0Directorise(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	dirs, err := m.List()
+	assert.NoError(t, err)
+	assert.Len(t, dirs, 0)
+}
+
+func TestList_listsDirectories(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	_, err = m.Create("/abc")
+	assert.NoError(t, err)
+
+	_, err = m.Create("/def")
+	assert.NoError(t, err)
+
+	dirs, err := m.List()
+	assert.NoError(t, err)
+	assert.Len(t, dirs, 2)
+	assert.Equal(t, "abc", dirs[0])
+	assert.Equal(t, "def", dirs[1])
+}

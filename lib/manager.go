@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -38,6 +39,23 @@ func New(cfg Config) (manager Manager, err error) {
 	}
 
 	manager.root = cfg.Root
+	return
+}
+
+func (m Manager) List() (directories []string, err error) {
+	files, err := ioutil.ReadDir(m.root)
+	if err != nil {
+		err = errors.Wrapf(err,
+			"Couldn't list files/directories from %s", m.root)
+		return
+	}
+
+	for _, file := range files {
+		if file.IsDir() {
+			directories = append(directories, file.Name())
+		}
+	}
+
 	return
 }
 
