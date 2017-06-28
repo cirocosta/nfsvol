@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/cirocosta/nfsvol/manager"
 	"github.com/pkg/errors"
 
 	v "github.com/docker/go-plugins-helpers/volume"
@@ -16,7 +17,6 @@ const (
 )
 
 func main() {
-
 	if os.Getenv("DEBUG") != "1" {
 		log.SetLevel(log.DebugLevel)
 	}

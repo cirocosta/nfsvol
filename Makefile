@@ -7,14 +7,14 @@ PLUGIN_ID			:= $(shell docker plugin inspect $(PLUGIN_NAME) --format '{{ .ID }}'
 install:
 	cd main && \
 		go install -v
-	cd lib && \
+	cd manager && \
 		go install -v
 	cd nfsvolctl && \
 		go install -v
 
 
 test:
-	cd ./lib && go test -v
+	cd ./manager && go test -v
 
 
 deps:
@@ -23,7 +23,7 @@ deps:
 
 fmt:
 	cd ./main && gofmt -s -w .
-	cd ./lib && gofmt -s -w .
+	cd ./manager && gofmt -s -w .
 	cd ./nfsvolctl && gofmt -s -w .
 
 

@@ -2,6 +2,7 @@ FROM golang:alpine as builder
 
 ADD ./main /go/src/github.com/cirocosta/nfsvol/main
 ADD ./vendor /go/src/github.com/cirocosta/nfsvol/vendor
+ADD ./manager /go/src/github.com/cirocosta/nfsvol/manager
 
 WORKDIR /go/src/github.com/cirocosta/nfsvol
 RUN set -ex && \
