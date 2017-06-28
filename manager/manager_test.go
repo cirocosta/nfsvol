@@ -6,9 +6,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/cirocosta/nfsvol/manager"
 	"github.com/stretchr/testify/assert"
-
-	manager "github.com/cirocosta/nfsvol/lib"
 )
 
 func TestNew_failsWithoutRootSpecified(t *testing.T) {
@@ -124,4 +123,19 @@ func TestList_listsDirectories(t *testing.T) {
 	assert.Len(t, dirs, 2)
 	assert.Equal(t, "abc", dirs[0])
 	assert.Equal(t, "def", dirs[1])
+}
+
+func TestGet_doesntErrorIfNotFound(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	_, found, err := m.Get("abc")
+	assert.NoError(t, err)
+	assert.False(t, found)
 }

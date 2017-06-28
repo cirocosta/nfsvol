@@ -59,6 +59,25 @@ func (m Manager) List() (directories []string, err error) {
 	return
 }
 
+func (m Manager) Get(name string) (absPath string, found bool, err error) {
+	files, err := ioutil.ReadDir(m.root)
+	if err != nil {
+		err = errors.Wrapf(err,
+			"Couldn't list files/directories from %s", m.root)
+		return
+	}
+
+	for _, file := range files {
+		if file.IsDir() && file.Name() == name {
+			found = true
+			absPath = filepath.Join(m.root, name)
+			return
+		}
+	}
+
+	return
+}
+
 func (m Manager) Create(path string) (absPath string, err error) {
 	if path == "" {
 		err = errors.Errorf(
