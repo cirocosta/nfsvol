@@ -13,3 +13,6 @@ import:
   - assert
 - package: gopkg.in/urfave/cli.v1
   version: v1.19.1
+- package: golang.org/x/sys
+  subpackages:
+  - unix

@@ -10,12 +10,17 @@ install:
 		go install -v
 
 
+test:
+	cd ./lib && go test -v
+
+
 deps:
 	glide install
 
 
 fmt:
 	cd ./main && gofmt -s -w .
+	cd ./lib && gofmt -s -w .
 	cd ./nfsvolctl && gofmt -s -w .
 
 
@@ -59,4 +64,4 @@ plugin-exec:
 		/bin/sh -c 'docker-runc exec -t $(PLUGIN_ID) sh'
 
 
-.PHONY: install deps fmt rootfs-image rootfs plugin plugin-logs plugin-exec
+.PHONY: install deps fmt rootfs-image rootfs plugin plugin-logs plugin-exec test
