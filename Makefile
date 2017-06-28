@@ -1,5 +1,7 @@
 ROOTFS_IMAGE		:= cirocosta/nfsvol-rootfs
 ROOTFS_CONTAINER	:= rootfs
+PLUGIN_NAME			:= nfsvol
+PLUGIN_ID			:= $(shell docker plugin inspect $(PLUGIN_NAME) --format '{{ .ID }}')
 
 install:
 	cd main && \
@@ -9,7 +11,7 @@ deps:
 	glide install
 
 fmt:
-	gofmt -s -w ./main
+	cd ./main && gofmt -s -w .
 
 rootfs-image:
 	docker build -t $(ROOTFS_IMAGE) .
@@ -22,5 +24,28 @@ rootfs: rootfs-image
 	docker export $(ROOTFS_CONTAINER) | tar -x -C plugin/rootfs
 	docker rm -vf $(ROOTFS_CONTAINER)
 
+plugin: rootfs
+	docker plugin disable $(PLUGIN_NAME) || true
+	docker plugin rm $(PLUGIN_NAME) || true
+	docker plugin create $(PLUGIN_NAME) ./plugin
+	docker plugin enable $(PLUGIN_NAME)
 
-.PHONY: install deps fmt rootfs-image rootfs
+plugin-logs:
+	docker run \
+		--rm \
+		-it \
+		--privileged \
+		--pid=host \
+		justincormack/nsenter1 \
+		/bin/sh -c 'docker-runc exec $(PLUGIN_ID) cat /var/log/nfsvol-plugin.log'
+
+plugin-exec:
+	docker run \
+		--rm \
+		-it \
+		--privileged \
+		--pid=host \
+		justincormack/nsenter1 \
+		/bin/sh -c 'docker-runc exec -t $(PLUGIN_ID) sh'
+
+.PHONY: install deps fmt rootfs-image rootfs plugin plugin-logs plugin-exec

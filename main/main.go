@@ -10,13 +10,25 @@ import (
 )
 
 const (
-	socketAddress = "/run/docker/plugins/nfsvol.sock"
+	socketAddress      = "/run/docker/plugins/nfsvol.sock"
+	logFileDestination = "/var/log/nfsvol-plugin.log"
 )
 
 func main() {
-	if os.Getenv("DEBUG") != "" {
+	if os.Getenv("DEBUG") != "1" {
 		log.SetLevel(log.DebugLevel)
 	}
+
+	f, err := os.Create(logFileDestination)
+	if err != nil {
+		err = errors.Wrapf(err,
+			"Failed to create log file at %s", logFileDestination)
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(f)
 
 	d, err := newNfsVolDriver()
 	if err != nil {

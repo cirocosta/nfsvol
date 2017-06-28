@@ -10,6 +10,6 @@ RUN set -ex && \
   mv ./main /usr/bin/nfsvol
 
 FROM busybox
-COPY --from=builder /usr/bin/nfsvol /usr/local/bin
+COPY --from=builder /usr/bin/nfsvol /nfsvol
 
 CMD [ "nfsvol" ]

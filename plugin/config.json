@@ -1,0 +1,31 @@
+{
+    "Description": "Docker plugin to manage NFS-mounted volumes",
+    "Documentation": "https://github.com/cirocosta/nfsvol",
+    "Entrypoint": [
+        "/nfsvol"
+    ],
+    "Env": [
+        {
+            "Description": "Whether debug mode should be enabled",
+            "Name": "DEBUG",
+            "Settable": [
+                "value"
+            ],
+            "Value": "1"
+        }
+    ],
+    "Interface": {
+        "Socket": "nfsvol.sock",
+        "Types": [
+            "docker.volumedriver/1.0"
+        ]
+    },
+    "Linux": {
+        "Capabilities": [
+                "CAP_SYS_ADMIN"
+        ]
+    },
+    "Network": {
+        "Type": "host"
+    }
+}
