@@ -42,7 +42,7 @@ rootfs: rootfs-image
 
 plugin: rootfs
 	docker plugin disable $(PLUGIN_NAME) || true
-	docker plugin rm $(PLUGIN_NAME) || true
+	docker plugin rm --force $(PLUGIN_NAME) || true
 	docker plugin create $(PLUGIN_NAME) ./plugin
 	docker plugin enable $(PLUGIN_NAME)
 

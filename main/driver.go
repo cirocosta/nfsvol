@@ -36,25 +36,33 @@ func newNfsVolDriver() (d nfsVolDriver, err error) {
 }
 
 func (d nfsVolDriver) Create(req v.Request) (resp v.Response) {
-	d.logger.
+	logger := d.logger.
 		WithField("name", req.Name).
-		WithField("opts", req.Options).
-		Debug("received request to create volume")
+		WithField("opts", req.Options)
 
-	_, err := d.manager.Create("/" + req.Name)
+	logger.Debug("received request to create volume")
+
+	abs, err := d.manager.Create(req.Name)
 	if err != nil {
+		logger.WithError(err).Error("couldn't create volume")
 		resp.Err = err.Error()
 		return
 	}
 
+	logger.WithField("abs", abs).Debug("volume created")
 	return
 }
 
 func (d nfsVolDriver) List(req v.Request) (resp v.Response) {
-	d.logger.Debug("received request to list volumes")
+	logger := d.logger.
+		WithField("name", req.Name).
+		WithField("opts", req.Options)
+
+	logger.Debug("received request to list volumes")
 
 	dirs, err := d.manager.List()
 	if err != nil {
+		logger.WithError(err).Error("couldn't list volumes")
 		resp.Err = err.Error()
 		return
 	}
@@ -66,21 +74,29 @@ func (d nfsVolDriver) List(req v.Request) (resp v.Response) {
 		}
 	}
 
+	logger.
+		WithField("number-of-volumes", len(dirs)).
+		Debug("volumes listed")
+
 	return
 }
 
 func (d nfsVolDriver) Get(req v.Request) (resp v.Response) {
-	d.logger.
+	logger := d.logger.
 		WithField("name", req.Name).
-		Debug("received request to get volume")
+		WithField("opts", req.Options)
+
+	logger.Debug("received request to get volume")
 
 	mp, found, err := d.manager.Get(req.Name)
 	if err != nil {
+		logger.WithError(err).Error("errored retrieving path for volume")
 		resp.Err = err.Error()
 		return
 	}
 
 	if !found {
+		logger.WithError(err).Info("volume not found")
 		resp.Err = fmt.Sprintf("volume %s not found", req.Name)
 		return
 	}
@@ -89,13 +105,28 @@ func (d nfsVolDriver) Get(req v.Request) (resp v.Response) {
 		Name:       req.Name,
 		Mountpoint: mp,
 	}
+
+	logger.WithField("mountpoint", mp).Debug("volume found")
+
 	return
 }
 
-func (d nfsVolDriver) Remove(req v.Request) v.Response {
-	d.logger.
+func (d nfsVolDriver) Remove(req v.Request) (resp v.Response) {
+	logger := d.logger.
 		WithField("name", req.Name).
-		Debug("received request to remove volume")
+		WithField("opts", req.Options)
+
+	logger.Debug("received request to remove volume")
+
+	err := d.manager.Delete(req.Name)
+	if err != nil {
+		logger.WithError(err).Error("errored trying to delete volume")
+		resp.Err = err.Error()
+		return
+	}
+
+	logger.Debug("volume deleted")
+
 	return v.Response{}
 }
 
