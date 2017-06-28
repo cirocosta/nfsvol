@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
@@ -60,6 +61,8 @@ func (m Manager) List() (directories []string, err error) {
 }
 
 func (m Manager) Get(name string) (absPath string, found bool, err error) {
+	name = strings.Trim(name, "/")
+
 	files, err := ioutil.ReadDir(m.root)
 	if err != nil {
 		err = errors.Wrapf(err,

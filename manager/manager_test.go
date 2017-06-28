@@ -139,3 +139,44 @@ func TestGet_doesntErrorIfNotFound(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, found)
 }
+
+func TestGet_findsDirectory(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	_, err = m.Create("/abc")
+	assert.NoError(t, err)
+
+	mp, found, err := m.Get("abc")
+	assert.NoError(t, err)
+	assert.True(t, found)
+	assert.Equal(t, path.Join(dir, "abc"), mp)
+}
+
+func TestGet_findsDirectoryWithOrWithoutLeadingSlash(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	_, err = m.Create("/abc")
+	assert.NoError(t, err)
+
+	_, found, err := m.Get("/abc")
+	assert.NoError(t, err)
+	assert.True(t, found)
+
+	_, found, err = m.Get("abc/")
+	assert.NoError(t, err)
+	assert.True(t, found)
+}
