@@ -39,5 +39,9 @@ func (d nfsVolDriver) Unmount(v.UnmountRequest) v.Response {
 }
 
 func (d nfsVolDriver) Capabilities(v.Request) v.Response {
-  return v.Response{}
+  return v.Response{
+    Capabilities: v.Capability{
+      Scope: 'local',
+    },
+  }
 }
