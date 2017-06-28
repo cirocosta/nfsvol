@@ -7,5 +7,8 @@ image:
 deps:
 	glide install
 
+fmt:
+	gofmt -s -w main.go driver.go
 
-.PHONY: install image deps
+
+.PHONY: install image deps fmt
