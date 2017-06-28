@@ -39,3 +39,45 @@ func TestNew_succeedsWithWriteableAbsolutePath(t *testing.T) {
 	})
 	assert.NoError(t, err)
 }
+
+func TestCreate_failsIfEmptyPath(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	_, err = m.Create("")
+	assert.Error(t, err)
+}
+
+func TestCreate_failsIfNotAbsolutePath(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	_, err = m.Create("abc")
+	assert.Error(t, err)
+}
+
+func TestCreate_succeedsWithAbsolutePath(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	m, err := manager.New(manager.Config{
+		Root: dir,
+	})
+	assert.NoError(t, err)
+
+	_, err = m.Create("/abc")
+	assert.NoError(t, err)
+}

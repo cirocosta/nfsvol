@@ -40,6 +40,19 @@ func New(cfg Config) (manager Manager, err error) {
 	return
 }
 
-func (m Manager) Create(name string) (err error) {
+func (m Manager) Create(path string) (absPath string, err error) {
+	if path == "" {
+		err = errors.Errorf(
+			"Can't create with empty path")
+		return
+	}
+
+	if !filepath.IsAbs(path) {
+		err = errors.Errorf(
+			"path (%s) must be absolute",
+			path)
+		return
+	}
+
 	return
 }
