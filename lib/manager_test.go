@@ -3,6 +3,7 @@ package lib_test
 import (
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -78,6 +79,11 @@ func TestCreate_succeedsWithAbsolutePath(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	_, err = m.Create("/abc")
+	absPath, err := m.Create("/abc")
 	assert.NoError(t, err)
+	assert.Equal(t, path.Join(dir, "abc"), absPath)
+
+	finfo, err := os.Stat(absPath)
+	assert.NoError(t, err)
+	assert.True(t, finfo.IsDir())
 }

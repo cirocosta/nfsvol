@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
@@ -51,6 +52,14 @@ func (m Manager) Create(path string) (absPath string, err error) {
 		err = errors.Errorf(
 			"path (%s) must be absolute",
 			path)
+		return
+	}
+
+	absPath = filepath.Join(m.root, path)
+	err = os.MkdirAll(absPath, 0755)
+	if err != nil {
+		err = errors.Wrapf(err,
+			"Couldn't create directory %s", absPath)
 		return
 	}
 
