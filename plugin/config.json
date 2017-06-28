@@ -22,21 +22,21 @@
     },
     "Linux": {
         "Capabilities": [
-                "CAP_SYS_ADMIN"
+            "CAP_SYS_ADMIN"
         ]
-    },
-    "Network": {
-        "Type": "host"
     },
     "Mounts": [
         {
-            "destination": "/mnt/efs",
-            "options": [
+            "Destination": "/mnt/nfs",
+            "Options": [
                 "bind"
             ],
-            "source": "/mnt/efs/",
-            "type": "bind"
+            "Source": "/mnt/nfs",
+            "Type": "bind"
         }
     ],
+    "Network": {
+        "Type": "host"
+    },
     "PropagatedMount": "/mnt"
 }

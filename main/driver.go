@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	HostMountPoint = "/mnt/efs"
+	HostMountPoint = "/mnt/nfs"
 )
 
 type nfsVolDriver struct {
