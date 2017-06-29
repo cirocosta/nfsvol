@@ -1,6 +1,7 @@
 ROOTFS_IMAGE		:= cirocosta/nfsvol-rootfs
 ROOTFS_CONTAINER	:= rootfs
 PLUGIN_NAME			:= nfsvol
+PLUGIN_FULL_NAME	:= cirocosta/nfsvol
 PLUGIN_ID			:= $(shell docker plugin inspect $(PLUGIN_NAME) --format '{{ .ID }}')
 
 
@@ -45,6 +46,12 @@ plugin: rootfs
 	docker plugin rm --force $(PLUGIN_NAME) || true
 	docker plugin create $(PLUGIN_NAME) ./plugin
 	docker plugin enable $(PLUGIN_NAME)
+
+
+plugin-push: rootfs
+	docker plugin rm --force $(PLUGIN_FULL_NAME) || true
+	docker plugin create $(PLUGIN_FULL_NAME) ./plugin
+	docker plugin push $(PLUGIN_FULL_NAME)
 
 
 plugin-logs:

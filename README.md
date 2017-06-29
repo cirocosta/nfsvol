@@ -18,6 +18,7 @@ Having that, install the plugin:
 ```sh
 docker plugin install \
         --grant-all-permissions \
+        --alias nfsvol \
         cirocosta/nfsvol
 ```
 
