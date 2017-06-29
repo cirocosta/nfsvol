@@ -34,7 +34,7 @@ rootfs-image:
 
 rootfs: rootfs-image
 	docker rm -vf $(ROOTFS_CONTAINER) || true
-	docker create --name $(ROOTFS_CONTAINER) $(ROOTFS_IMAGE) true
+	docker create --name $(ROOTFS_CONTAINER) $(ROOTFS_IMAGE) || true
 	mkdir -p plugin/rootfs
 	rm -rf plugin/rootfs/*
 	docker export $(ROOTFS_CONTAINER) | tar -x -C plugin/rootfs
