@@ -19,18 +19,11 @@ type Config struct {
 }
 
 var (
-	NameRegex      = regexp.MustCompile(`^[a-zA-Z][\w\-]{1,30}$`)
+	NameRegex = regexp.MustCompile(`^[a-zA-Z][\w\-]{1,30}$`)
+
 	ErrInvalidName = errors.Errorf("Invalid name")
 	ErrNotFound    = errors.Errorf("Volume not found")
 )
-
-func isValidName(name string) bool {
-	if name == "" {
-		return false
-	}
-
-	return NameRegex.MatchString(name)
-}
 
 func New(cfg Config) (manager Manager, err error) {
 	if cfg.Root == "" {
@@ -143,4 +136,12 @@ func (m Manager) Delete(name string) (err error) {
 	}
 
 	return
+}
+
+func isValidName(name string) bool {
+	if name == "" {
+		return false
+	}
+
+	return NameRegex.MatchString(name)
 }

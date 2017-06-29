@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/cirocosta/nfsvol/manager"
 	"github.com/pkg/errors"
@@ -18,6 +19,7 @@ const (
 type nfsVolDriver struct {
 	logger  *log.Entry
 	manager *manager.Manager
+	sync.Mutex
 }
 
 func newNfsVolDriver() (d nfsVolDriver, err error) {
@@ -46,6 +48,9 @@ func (d nfsVolDriver) Create(req v.Request) (resp v.Response) {
 		WithField("opts", req.Options)
 	logger.Debug("start")
 
+	d.Lock()
+	defer d.Unlock()
+
 	abs, err := d.manager.Create(req.Name)
 	if err != nil {
 		logger.WithError(err).Error("couldn't create volume")
@@ -66,6 +71,9 @@ func (d nfsVolDriver) List(req v.Request) (resp v.Response) {
 		WithField("name", req.Name).
 		WithField("opts", req.Options)
 	logger.Debug("start")
+
+	d.Lock()
+	defer d.Unlock()
 
 	dirs, err := d.manager.List()
 	if err != nil {
@@ -94,6 +102,9 @@ func (d nfsVolDriver) Get(req v.Request) (resp v.Response) {
 		WithField("name", req.Name).
 		WithField("opts", req.Options)
 	logger.Debug("start")
+
+	d.Lock()
+	defer d.Unlock()
 
 	mp, found, err := d.manager.Get(req.Name)
 	if err != nil {
@@ -127,6 +138,9 @@ func (d nfsVolDriver) Remove(req v.Request) (resp v.Response) {
 		WithField("opts", req.Options)
 	logger.Debug("start")
 
+	d.Lock()
+	defer d.Unlock()
+
 	err := d.manager.Delete(req.Name)
 	if err != nil {
 		logger.WithError(err).Error("errored trying to delete volume")
@@ -145,6 +159,9 @@ func (d nfsVolDriver) Path(req v.Request) (resp v.Response) {
 		WithField("name", req.Name).
 		WithField("method", "path")
 	logger.Debug("start")
+
+	d.Lock()
+	defer d.Unlock()
 
 	mp, found, err := d.manager.Get(req.Name)
 	if err != nil {
@@ -173,6 +190,9 @@ func (d nfsVolDriver) Mount(req v.MountRequest) (resp v.Response) {
 		WithField("id", req.ID)
 	logger.Debug("start")
 
+	d.Lock()
+	defer d.Unlock()
+
 	mp, found, err := d.manager.Get(req.Name)
 	if err != nil {
 		logger.WithError(err).Error("errored retrieving path for volume")
@@ -199,6 +219,9 @@ func (d nfsVolDriver) Unmount(req v.UnmountRequest) (resp v.Response) {
 		WithField("id", req.ID)
 	logger.Debug("start")
 	logger.Debug("finish")
+
+	d.Lock()
+	defer d.Unlock()
 
 	return
 }
