@@ -1,17 +1,16 @@
-ROOTFS_IMAGE		:= cirocosta/nfsvol-rootfs
-ROOTFS_CONTAINER	:= rootfs
-PLUGIN_NAME			:= nfsvol
-PLUGIN_FULL_NAME	:= cirocosta/nfsvol
-PLUGIN_ID			:= $(shell docker plugin inspect $(PLUGIN_NAME) --format '{{ .ID }}')
+VERSION				:=	$(shell cat ./VERSION)
+ROOTFS_IMAGE		:=	cirocosta/nfsvol-rootfs
+ROOTFS_CONTAINER	:=	rootfs
+PLUGIN_NAME			:=	nfsvol
+PLUGIN_FULL_NAME	:=	cirocosta/nfsvol
+PLUGIN_ID			:=	$(shell docker plugin inspect $(PLUGIN_NAME) --format '{{ .ID }}')
 
 
 install:
 	cd main && \
-		go install -v
-	cd manager && \
-		go install -v
+		go install -ldflags "-X main.version=$(VERSION)" -v
 	cd nfsvolctl && \
-		go install -v
+		go install -ldflags "-X main.version=$(VERSION)" -v
 
 
 test:
@@ -23,9 +22,9 @@ deps:
 
 
 fmt:
-	cd ./main && gofmt -s -w .
-	cd ./manager && gofmt -s -w .
-	cd ./nfsvolctl && gofmt -s -w .
+	cd ./main && go fmt
+	cd ./manager && go fmt
+	cd ./nfsvolctl && go fmt
 
 
 rootfs-image:
@@ -51,7 +50,9 @@ plugin: rootfs
 plugin-push: rootfs
 	docker plugin rm --force $(PLUGIN_FULL_NAME) || true
 	docker plugin create $(PLUGIN_FULL_NAME) ./plugin
+	docker plugin create $(PLUGIN_FULL_NAME):$(VERSION) ./plugin
 	docker plugin push $(PLUGIN_FULL_NAME)
+	docker plugin push $(PLUGIN_FULL_NAME):$(VERSION)
 
 
 plugin-logs:

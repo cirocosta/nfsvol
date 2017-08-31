@@ -15,10 +15,18 @@ const (
 	logFileDestination = "/var/log/nfsvol/plugin.log"
 )
 
+var (
+	version string = "master-dev"
+)
+
 func main() {
 	if os.Getenv("DEBUG") == "1" {
 		log.SetLevel(log.DebugLevel)
 	}
+
+	log.
+		WithField("version", version).
+		Info("starting NFSVOL plugin")
 
 	f, err := os.Create(logFileDestination)
 	if err != nil {
