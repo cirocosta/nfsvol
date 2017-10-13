@@ -19,7 +19,7 @@ type Config struct {
 }
 
 var (
-	NameRegex = regexp.MustCompile(`^[a-zA-Z][\w\-]{1,250}$`)
+	NameRegex = regexp.MustCompile(`^[a-zA-Z0-9][\w\-]{1,250}$`)
 
 	ErrInvalidName = errors.Errorf("Invalid name")
 	ErrNotFound    = errors.Errorf("Volume not found")
